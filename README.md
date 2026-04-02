@@ -6,10 +6,8 @@ The project is built around modularity and quickly generation of initial structu
 
 ## Requirements
 
-– Make sure you have the latest [AmberTools](https://ambermd.org/AmberTools.php) installed.<br>
-– Make sure you have the latest version of [CPPTRAJ](https://github.com/Amber-MD/cpptraj) installed.<br>
+See https://modxna.chpc.utah.edu/ for more details.
 
-## Learn more
-
-Reference: [Love et. al, "modXNA: A Modular Approach to Parametrization of Modified Nucleic Acids for Use with Amber Force Fields", JCTC, 2024, 20, 21, 9354-9363](https://pubs.acs.org/doi/10.1021/acs.jctc.4c01164)<br>
-Tutorial: [Galindo-Murillo et. al, "Parameterizing modified nucleic acids for molecular simulations in the AMBER MD software environment", LiveCoMS, 2025, 6, 1](https://livecomsjournal.org/index.php/livecoms/article/view/v6i1e4545)<br>
+Learn more: <br>
+https://pubs.acs.org/doi/10.1021/acs.jctc.4c01164<br>
+https://livecomsjournal.org/index.php/livecoms/article/view/v6i1e4545<br>
