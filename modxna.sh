@@ -4,7 +4,7 @@
 ## modXNA.sh                                        ##
 ## Script to generate modified nucleotides.         ##
 ######################################################
-VERSION='1.9.2'
+VERSION='1.9.3'
 
 # Check for required programs
 if [ -z "$CPPTRAJ" ] ; then
@@ -60,6 +60,10 @@ fi
 if [ $cc_version_ok -eq 0 ] ; then
   echo -e "  \e[31mError: CPPTRAJ version is too old. Require at least 6.26.0\e[39m"
   exit 1
+fi
+cpptraj7=0
+if [ $cc_version_major -ge 7 ] ; then
+  cpptraj7=1
 fi
 
 # Check LEAP
@@ -119,6 +123,28 @@ clean_temp_files() {
     fi
     shift
   done
+}
+
+get_3cap_sugar_charges() {
+  if [ -z "$1" ] ; then
+    echo "Internal Error: No mol2 file given to get_3cap_sugar_charges()"
+    exit 1
+  fi
+  Q_O2P=''
+  Q_HO2P=''
+  cat > tmp.extract.cpptraj <<EOF
+atoms @O2'  out tmp.sugar.o2p.dat  noheader
+atoms @HO2' out tmp.sugar.ho2p.dat noheader
+EOF
+  cpptraj -p $1 -i tmp.extract.cpptraj > tmp.extract.cpptraj.out 2>&1
+  # Check if O2'/HO2' is present
+  NLINES=`cat tmp.sugar.o2p.dat | wc -l`
+  NLINES2=`cat tmp.sugar.ho2p.dat | wc -l`
+  if [ $NLINES -eq 2 -a $NLINES2 -eq 2 ] ; then
+    Q_O2P=`tail -n 1 tmp.sugar.o2p.dat | awk '{print $7;}'`
+    Q_HO2P=`tail -n 1 tmp.sugar.ho2p.dat | awk '{print $7;}'`
+    echo "3CAP: O2'($Q_O2P)/HO2'($Q_HO2P) is present."
+  fi
 }
 
 # ==============================================================================
@@ -345,6 +371,86 @@ EOF
       cp tmp.sugar.mol2 tmp2.sugar.mol2
     fi # END sugar modifications
 
+    ## If 3 capping fix atom type of O3' and name of H bound to O3'.
+    Q_O2P=''
+    Q_HO2P=''
+    if [ $IS_3CAP -eq 1 ] ; then
+      for TMPFILE in tmp.sugar.bonds.dat tmp.sugar.o2p.dat tmp.sugar.ho2p.dat ; do
+        if [ -f "$TMPFILE" ] ; then
+          rm $TMPFILE
+        fi
+      done
+      # First change name of H bonded to O3'
+      cpptraj > tmp.cpptraj.out 2>&1 <<EOF
+parm tmp2.sugar.mol2
+bonds @O3' @/H out tmp.sugar.bonds.dat
+EOF
+      # Sanity checks
+      if [ ! -f 'tmp.sugar.bonds.dat' ] ; then
+        echo "Error: Could not determine H atom bonded to O3'"
+        exit 1
+      fi
+      # Check if we have the RK/REQ columns
+      if [ "`head -n 1 tmp.sugar.bonds.dat | awk '{print $2;}'`" = 'RK' ] ; then
+        sugar_col_offset=2
+      else
+        sugar_col_offset=0
+      fi
+      NLINES=`cat tmp.sugar.bonds.dat | wc -l`
+      if [ $NLINES -ne 2 ] ; then
+        echo "Error: Only expected 2 lines in tmp.sugar.bonds.dat, got $NLINES"
+        exit 1
+      fi
+      O_ATOM_NAME=`tail -n 1 tmp.sugar.bonds.dat | awk -v offset=$sugar_col_offset '{print $(offset+2)}'`
+      H_ATOM_NAME=`tail -n 1 tmp.sugar.bonds.dat | awk -v offset=$sugar_col_offset '{print $(offset+3)}'`
+      H_ATOM_NUM=`tail -n 1 tmp.sugar.bonds.dat  | awk -v offset=$sugar_col_offset '{print $(offset+5)}'`
+      H_ATOM_TYPE=`tail -n 1 tmp.sugar.bonds.dat | awk -v offset=$sugar_col_offset '{print $(offset+7)}'`
+      echo "3CAP: O3' atom name $O_ATOM_NAME, H atom name $H_ATOM_NAME, H atom num $H_ATOM_NUM, H atom type $H_ATOM_TYPE"
+      if [ "$H_ATOM_TYPE" != 'HO' ] ; then
+        echo "Error: Expected H atom bonded to O3' type to be HO, got $H_ATOM_TYPE"
+        exit 1
+      fi
+      if [ "$H_ATOM_NAME" != ":1$TAIL01SUGARSTRIP" ] ; then
+        echo "Error: Expected H atom bonded to O3' mask name to be :1$TAIL01SUGARSTRIP, got $H_ATOM_NAME"
+        exit 1
+      fi
+      cpptraj >> tmp.cpptraj.out <<EOF
+parm tmp2.sugar.mol2
+trajin tmp2.sugar.mol2
+change atomname from $H_ATOM_NAME to HO3'
+trajout tmp2.sugar-stripped.mol2
+EOF
+      if [ $? -ne 0 ] ; then
+        echo "Error: Changing H atom bonded to O3' atom name failed. Check tmp.cpptraj.out."
+        exit 1
+      fi
+      mv tmp2.sugar-stripped.mol2 tmp2.sugar.mol2
+      # Next change atom type of O3' to OH
+      # TODO implement 'change atomtype' in cpptraj
+      awk 'BEGIN{in_atom = 0; changed = 0;}{
+        if (in_atom == 0) {
+          if ($1 == "@<TRIPOS>ATOM")
+            in_atom = 1;
+          print $0;
+        } else {
+          if ($2 == "O3'\''") {
+            printf("%7i %-8s %9.4f %9.4f %9.4f %-5s %6i %-6s %10.6f\n", $1, $2, $3, $4, $5, "OH", $7, $8, $9);
+            changed = 1;
+            in_atom = 0;
+          } else
+            print $0;
+        }
+      }END{
+        if (changed == 0) exit 1;
+        exit 0;
+      }' tmp2.sugar.mol2 > tmp2.sugar-stripped.mol2
+      if [ $? -ne 0 ] ; then
+        echo "Error: Changing atom type of O3' atom failed."
+        exit 1
+      fi
+      mv tmp2.sugar-stripped.mol2 tmp2.sugar.mol2
+    fi
+
     ### ADD correction factors to the base
     if [ $base_has_modifications -eq 1 ] ; then
       echo "Applying chi corrections to base"
@@ -365,22 +471,23 @@ EOF
       cp tmp.base.mol2 tmp2.base.mol2
     fi # END base modifications
 
-    ## Strip fragments from capping groups
-    ## Adjust the charge for each fragment
-    cat > tmp.strip.cpptraj<<EOF
+    if [ $cpptraj7 -eq 0 ] ; then
+      ## Strip fragments from capping groups
+      ## Adjust the charge for each fragment 
+      cat > tmp.strip.cpptraj<<EOF
 ### BACKBONE
 parm tmp.bb.mol2 name backbone
 trajin tmp.bb.mol2 parm backbone
 EOF
 
-    if [ $IS_5CAP -eq 0 ]; then
-      echo "strip $HEAD01BACKBONESTRIP" >> tmp.strip.cpptraj
-      TAIL01BACKBONECHARGE='charge -0.8832'
-    else
-      TAIL01BACKBONECHARGE=''
-    fi
+      if [ $IS_5CAP -eq 0 ]; then
+        echo "strip $HEAD01BACKBONESTRIP" >> tmp.strip.cpptraj
+        TAIL01BACKBONECHARGE='charge -0.8832'
+      else
+        TAIL01BACKBONECHARGE=''
+      fi
 
-    cat >> tmp.strip.cpptraj<<EOF
+      cat >> tmp.strip.cpptraj<<EOF
 strip $TAIL01BACKBONESTRIP $TAIL01BACKBONECHARGE
 trajout tmp.backbone-striped.mol2 mol2
 run
@@ -389,11 +496,11 @@ parm tmp2.sugar.mol2 name sugar
 trajin tmp2.sugar.mol2 parm sugar
 EOF
 
-    if [ $IS_3CAP -eq 0 ]; then	
+      if [ $IS_3CAP -eq 0 ]; then	
 	echo "strip $TAIL01SUGARSTRIP" >> tmp.strip.cpptraj
-    fi
+      fi
     
-    cat >> tmp.strip.cpptraj<<EOF
+      cat >> tmp.strip.cpptraj<<EOF
 strip $ANCHOR03SUGARSTRIP
 strip $HEAD01SUGARSTRIP charge -0.01191
 trajout tmp.sugar-striped.mol2 mol2
@@ -404,100 +511,21 @@ trajin tmp2.base.mol2 parm base
 strip $HEAD01BASESTRIP charge -0.10489
 trajout tmp.base-striped.mol2 mol2
 EOF
-    
-    ## Run CPPTRAJ, create stripped backbone and sugar
-    cpptraj -i tmp.strip.cpptraj
-    if [ $? -ne 0 ] ; then
-      echo "Error: Creation of stripped backbone and sugar failed."
-      exit 1
-    fi
+      ## Run CPPTRAJ, create stripped backbone and sugar
+      cpptraj -i tmp.strip.cpptraj
+      if [ $? -ne 0 ] ; then
+        echo "Error: Creation of stripped backbone and sugar failed."
+        exit 1
+      fi
+      if [ $IS_3CAP -eq 1 ] ; then
+        get_3cap_sugar_charges tmp.sugar-striped.mol2
+      fi # END 3cap charge extraction
+    fi # END if cpptraj not version 7
 
-    ## If 3 capping fix atom type of O3' and name of H bound to O3'.
-    Q_O2P=''
-    Q_HO2P=''
-    if [ $IS_3CAP -eq 1 ] ; then
-      for TMPFILE in tmp.sugar.bonds.dat tmp.sugar.o2p.dat tmp.sugar.ho2p.dat ; do
-        if [ -f "$TMPFILE" ] ; then
-          rm $TMPFILE
-        fi
-      done
-      # First change name of H bonded to O3'
-      cpptraj > tmp.cpptraj.out 2>&1 <<EOF
-parm tmp.sugar-striped.mol2
-bonds @O3' @/H out tmp.sugar.bonds.dat
-atoms @O2'  out tmp.sugar.o2p.dat  noheader
-atoms @HO2' out tmp.sugar.ho2p.dat noheader
-EOF
-      # Sanity checks
-      if [ ! -f 'tmp.sugar.bonds.dat' ] ; then
-        echo "Error: Could not determine H atom bonded to O3'"
-        exit 1
-      fi
-      NLINES=`cat tmp.sugar.bonds.dat | wc -l`
-      if [ $NLINES -ne 2 ] ; then
-        echo "Error: Only expected 2 lines in tmp.sugar.bonds.dat, got $NLINES"
-        exit 1
-      fi
-      O_ATOM_NAME=`tail -n 1 tmp.sugar.bonds.dat | awk '{print $4}'`
-      H_ATOM_NAME=`tail -n 1 tmp.sugar.bonds.dat | awk '{print $5}'`
-      H_ATOM_NUM=`tail -n 1 tmp.sugar.bonds.dat | awk '{print $7}'`
-      H_ATOM_TYPE=`tail -n 1 tmp.sugar.bonds.dat | awk '{print $9}'`
-      echo "3CAP: O3' atom name $O_ATOM_NAME, H atom name $H_ATOM_NAME, H atom num $H_ATOM_NUM, H atom type $H_ATOM_TYPE"
-      if [ "$H_ATOM_TYPE" != 'HO' ] ; then
-        echo "Error: Expected H atom bonded to O3' type to be HO, got $H_ATOM_TYPE"
-        exit 1
-      fi
-      if [ "$H_ATOM_NAME" != ":1$TAIL01SUGARSTRIP" ] ; then
-        echo "Error: Expected H atom bonded to O3' mask name to be :1$TAIL01SUGARSTRIP, got $H_ATOM_NAME"
-        exit 1
-      fi
-      # Check if O2'/HO2' is present
-      NLINES=`cat tmp.sugar.o2p.dat | wc -l`
-      NLINES2=`cat tmp.sugar.ho2p.dat | wc -l`
-      if [ $NLINES -eq 2 -a $NLINES2 -eq 2 ] ; then
-        Q_O2P=`tail -n 1 tmp.sugar.o2p.dat | awk '{print $7;}'`
-        Q_HO2P=`tail -n 1 tmp.sugar.ho2p.dat | awk '{print $7;}'`
-        echo "3CAP: O2'($Q_O2P)/HO2'($Q_HO2P) is present."
-      fi
-      cpptraj >> tmp.cpptraj.out <<EOF
-parm tmp.sugar-striped.mol2
-trajin tmp.sugar-striped.mol2
-change atomname from $H_ATOM_NAME to HO3'
-trajout tmp2.sugar-stripped.mol2
-EOF
-      if [ $? -ne 0 ] ; then
-        echo "Error: Changing H atom bonded to O3' atom name failed. Check tmp.cpptraj.out."
-        exit 1
-      fi
-      mv tmp2.sugar-stripped.mol2 tmp.sugar-striped.mol2
-      # Next change atom type of O3' to OH
-      # TODO implement 'change atomtype' in cpptraj
-      awk 'BEGIN{in_atom = 0; changed = 0;}{
-        if (in_atom == 0) {
-          if ($1 == "@<TRIPOS>ATOM")
-            in_atom = 1;
-          print $0;
-        } else {
-          if ($2 == "O3'\''") {
-            printf("%7i %-8s %9.4f %9.4f %9.4f %-5s %6i %-6s %10.6f\n", $1, $2, $3, $4, $5, "OH", $7, $8, $9);
-            changed = 1;
-            in_atom = 0;
-          } else
-            print $0;
-        }
-      }END{
-        if (changed == 0) exit 1;
-        exit 0;
-      }' tmp.sugar-striped.mol2 > tmp2.sugar-stripped.mol2
-      if [ $? -ne 0 ] ; then
-        echo "Error: Changing atom type of O3' atom failed."
-        exit 1
-      fi
-      mv tmp2.sugar-stripped.mol2 tmp.sugar-striped.mol2
-    fi
-    
-    ## Combine backbone and sugar fragments
-    cat > tmp.combine.cpptraj<<EOF
+    if [ $cpptraj7 -eq 0 ] ; then
+      ## ----- Cpptraj < version 7 -----
+      ## Combine backbone and sugar fragments
+      cat > tmp.combine.cpptraj<<EOF
 parm tmp.sugar-striped.mol2
 loadcrd tmp.sugar-striped.mol2 name Sugar parm tmp.sugar-striped.mol2
 parm tmp.backbone-striped.mol2
@@ -510,18 +538,18 @@ change crdset BackboneSugar resname from * to $RESNAME
 change crdset BackboneSugar oresnums of :1 min 1 max 1
 crdout BackboneSugar tmp.BackboneSugar.mol2
 EOF
-    ## Run CPPTRAJ, create sugar+base
-    cpptraj -i tmp.combine.cpptraj
-    if [ $? -ne 0 ] ; then
-      echo "Error: Creation of stripped sugar+base failed."
-      exit 1
-    fi
+      ## Run CPPTRAJ, create sugar+base
+      cpptraj -i tmp.combine.cpptraj
+      if [ $? -ne 0 ] ; then
+        echo "Error: Creation of stripped sugar+base failed."
+        exit 1
+      fi
     
-    ## Combine BackboneSugar and base
-    if [ -f 'tmp.Nucleotide.mol2' ] ; then
-      rm tmp.Nucleotide.mol2
-    fi
-    cat > tmp.combine.cpptraj<<EOF
+      ## Combine BackboneSugar and base
+      if [ -f 'tmp.Nucleotide.mol2' ] ; then
+        rm tmp.Nucleotide.mol2
+      fi
+      cat > tmp.combine.cpptraj<<EOF
 parm tmp.BackboneSugar.mol2
 loadcrd tmp.BackboneSugar.mol2 name BackboneSugar parm tmp.BackboneSugar.mol2
 parm tmp.base-striped.mol2
@@ -533,6 +561,67 @@ change crdset Nucleotide mergeres firstres 1 lastres 2
 change crdset Nucleotide resname from * to $RESNAME
 change crdset Nucleotide oresnums of :1 min 1 max 1
 EOF
+    else
+      ## ----- CPPTRAJ version 7 -----
+      # Needs to use graft FIXME need to fix 3cap atom type
+      # cpptraj v7 sugar + base
+      cat > tmp.sugarbase.cpptraj <<EOF
+parm tmp2.sugar.mol2
+loadcrd tmp2.sugar.mol2 parm tmp2.sugar.mol2 name Sugar
+
+parm tmp2.base.mol2
+loadcrd tmp2.base.mol2 parm tmp2.base.mol2 name Base
+list
+EOF
+      if [ $IS_3CAP -eq 0 ]; then	
+        echo "crdaction Sugar strip $TAIL01SUGARSTRIP" >> tmp.sugarbase.cpptraj
+      fi
+      cat >> tmp.sugarbase.cpptraj<<EOF
+# Create Sugar + Base
+graft ic name SugarBase \
+  tgt Sugar tgtmask !($ANCHOR03SUGARSTRIP|$HEAD01SUGARSTRIP) tgtcharge -0.01191 \
+  src Base  srcmask !$HEAD01BASESTRIP srccharge -0.10489 \
+  bond $ANCHOR03SUGAR,$HEAD01BASE
+change crdset SugarBase mergeres firstres 1 lastres 2
+change crdset SugarBase resname from * to $RESNAME
+change crdset SugarBase oresnums of :1 min 1 max 1
+crdout SugarBase tmp.SugarBase.mol2
+EOF
+      cpptraj -i tmp.sugarbase.cpptraj
+      if [ $? -ne 0 ] ; then
+        echo "Error: Creation of Sugar+Base failed."
+        exit 1
+      fi
+      if [ $IS_3CAP -eq 1 ] ; then
+        get_3cap_sugar_charges tmp.SugarBase.mol2
+      fi # END 3cap charge extraction
+      # cpptraj v7 backbone + sugar + base
+      cat > tmp.combine.cpptraj <<EOF
+parm tmp.bb.mol2
+loadcrd tmp.bb.mol2 parm tmp.bb.mol2 name BB
+
+parm tmp.SugarBase.mol2
+loadcrd tmp.SugarBase.mol2 parm tmp.SugarBase.mol2 name SugarBase
+EOF
+      if [ $IS_5CAP -eq 0 ]; then
+        echo "crdaction BB strip $HEAD01BACKBONESTRIP" >> tmp.combine.cpptraj
+        TAIL01BACKBONECHARGE='tgtcharge -0.8832'
+      else
+        TAIL01BACKBONECHARGE=''
+      fi
+      cat >> tmp.combine.cpptraj <<EOF
+# Create Nucleotide from Backbone + SugarBase
+graft ic name Nucleotide \
+  tgt BB tgtmask !$TAIL01BACKBONESTRIP $TAIL01BACKBONECHARGE \
+  src SugarBase srcmask * \
+  bond $TAIL01BACKBONE,$HEAD01SUGAR
+change crdset Nucleotide mergeres firstres 1 lastres 2
+change crdset Nucleotide resname from * to $RESNAME
+change crdset Nucleotide oresnums of :1 min 1 max 1
+EOF
+      #exit 1 # DEBUG
+
+    fi
     if [ $IS_3CAP -eq 1 ] ; then
       # Modify O3' and HO3' charges for 3-cap
       cat >> tmp.combine.cpptraj <<EOF
