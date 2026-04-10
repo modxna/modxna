@@ -1,0 +1,11 @@
+parm tmp.BackboneSugar.mol2
+loadcrd tmp.BackboneSugar.mol2 name BackboneSugar parm tmp.BackboneSugar.mol2
+parm tmp.base-striped.mol2
+loadcrd tmp.base-striped.mol2 name Base parm tmp.base-striped.mol2
+dataset connect BackboneSugar headmask @C1'
+dataset connect Base tailmask @N9
+sequence Base BackboneSugar name Nucleotide
+change crdset Nucleotide mergeres firstres 1 lastres 2
+change crdset Nucleotide resname from * to JCW
+change crdset Nucleotide oresnums of :1 min 1 max 1
+crdout Nucleotide tmp.Nucleotide.mol2

@@ -626,7 +626,7 @@ NT-CM-N2	110.7      123.46         CORR_SOURCE5          241    2.3941
 NT-CM-HA	64.8    120.99      SOURCE4_SOURCE5           77    1.9305
 NT-N2-H		67.7      108.56              SOURCE3           29    5.5708
 NT-P -O2	43.1	108.424	same as o -p4-os
-NT-P -S		104.9   105.46              SOURCE3            3    0.3561
+NT-P -S		104.9   105.46	              SOURCE3            3    0.3561
 O -C -HA	37.7    116.90      SOURCE3_SOURCE5         1456    0.6313
 O -P -O		45.1	119.572	same as o -p4-o
 O -P -OS	43.1	108.424	same as o -p4-os

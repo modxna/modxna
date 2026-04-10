@@ -1,0 +1,4 @@
+energy minimization
+ &cntrl
+  imin=1,maxcyc=5000,ncyc=2500,ntx=1,ntwr=100,ntpr=10,ioutfm=0,ntxo=1,cut=1000.0,ntb=0,igb=5,
+ &end
