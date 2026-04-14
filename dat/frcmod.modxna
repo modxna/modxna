@@ -110,6 +110,7 @@ NB-NB	290.7   1.3650      SOURCE3_SOURCE5     271      0.0065
 NB-H	406.6	0.998	same as hn-na
 NC-CM	431.6	1.309	same as cc-nc
 NT-N2	219.3   1.442      SOURCE1_SOURCE5      48      0.0063
+NT-CI	209.4   1.309
 OF-CT  320.0    1.410
 OF-P   323.7    1.6360              SOURCE3       4	 0.0057
 P -O	456.4	1.486	same as o -p4
@@ -117,6 +118,7 @@ P -S    525.0    2.016      MacLennan&Darvesh; Can. J. Chem. 73, 1995
 P -SO	239.2    1.9340      SOURCE1_SOURCE5     173      0.0138
 P -CT	177.2    1.8390      SOURCE1_SOURCE5     408      0.0183
 P -N2	344.6    1.5990
+P -NT	344.6    1.4901
 O2-NO	172.2    1.4210      SOURCE4_SOURCE5     138      0.0070
 S6-N    283.3    1.7190      SOURCE4_SOURCE5      45      0.0154
 S6-NT	326.0    1.6720      SOURCE1_SOURCE5     243      0.0144
@@ -320,6 +322,7 @@ N*-CK-O     	80.0    120.90
 N*-CK-N		115.5      112.22      SOURCE3_SOURCE5         2726    1.5103
 N*-CK-NA    	70.0    115.40
 NC-C -S		82.4      124.05      SOURCE3_SOURCE5          514    1.4099
+CI-NT-H		48.3      119.26         CORR_SOURCE5          459    1.7223
 CK-N*-CM	67.5      116.75              SOURCE3            1
 CK-NA-H     	30.0    120.00
 CC-C*-C*	67.9	107.215	same as cc-cc-cc
@@ -425,6 +428,7 @@ CT-CV-C*	66.7      115.97              SOURCE3            4    3.0507
 CT-CZ-N1	84.4    114.80              SOURCE4           12    1.8112
 CT-OS-OH	84.0    108.11      SOURCE4_SOURCE5           34    0.5701
 CT-OS-CV	66.4      117.37         CORR_SOURCE5          411    1.1548
+CT-CI-NT	84.7    120.71      SOURCE3_SOURCE5           11    0.9157
 CT-N2-CB	62.82	125.878	Calculated with empirical approach
 CT-N2-CK	62.82	124.774	Calculated with empirical approach
 CT-N2-CR	62.82	127.042	Calculated with empirical approach
@@ -610,6 +614,7 @@ NC-CQ-CT	67.1	116.471	same as c3-c2-n2
 NC-CQ-N2	73.9	117.514	same as nc-cc-nh
 NC-CQ-S		62.9	115.932	same as n2-c2-ss
 NC-CQ-OS	112.5   114.30      SOURCE4_SOURCE5           50    1.3395
+NT-CI-H1	62.5      125.52      SOURCE3_SOURCE5         1309    0.7276
 NT-CM-OS	112.5   114.30      SOURCE4_SOURCE5           50    1.3395
 NT-CM-N		71.8	126.003	Calculated with empirical approach
 NT-CM-NT	112.1      112.82      SOURCE4_SOURCE5          689    1.9577
@@ -620,6 +625,8 @@ NT-CT-H2	47.5    110.36      SOURCE3_SOURCE5        11033    0.8531
 NT-CM-N2	110.7      123.46         CORR_SOURCE5          241    2.3941
 NT-CM-HA	64.8    120.99      SOURCE4_SOURCE5           77    1.9305
 NT-N2-H		67.7      108.56              SOURCE3           29    5.5708
+NT-P -O2	43.1	108.424	same as o -p4-os
+NT-P -S		104.9   105.46              SOURCE3            3    0.3561
 O -C -HA	37.7    116.90      SOURCE3_SOURCE5         1456    0.6313
 O -P -O		45.1	119.572	same as o -p4-o
 O -P -OS	43.1	108.424	same as o -p4-os
@@ -742,6 +749,8 @@ O2-CT-H1   62.4      109.78      SOURCE3_SOURCE5        19982    1.1092
 CT-CT-O2   85.3      107.97      SOURCE3_SOURCE5        11384    1.3754
 CT-O2-P	   83.3      117.48              SOURCE3            4    0.3850
 P -N2-CM   78.4      134.23
+P -NT-CI   79.2      134.13
+P -NT-H    79.3      133.99
 N2-P -O2   79.5      120.46
 N2-P -OS   79.1      104.31 
 P -N2-SO   111.8      120.60              SOURCE3            1
@@ -786,6 +795,8 @@ X -CA-N -X    4    1.800       180.000           2.000
 X -N -S6-X    6    6.600       180.000           2.000
 X -NA-NB-X    4    9.000         0.000           2.000
 X -NT-S6-X    6   18.800         0.000           2.000
+X -NT-P -X    6   18.800         0.000           2.000
+X -CI-NT-X    1    0.300         0.000           3.000      same as X -c3-n3-X
 X -CT-SO-X    1    0.117         0.000           3          c59 SS AUE=0.2210 RMSE=0.2792 TorType=3
 X -SO-OH-X    1    0.000       180.000           1          c185 SS AUE=1.7272 RMSE=2.1061 TorType=3
 X -CC-C*-X    4   11.500       180.000           2.000      statistic value
