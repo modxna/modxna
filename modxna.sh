@@ -4,7 +4,7 @@
 ## modXNA.sh                                        ##
 ## Script to generate modified nucleotides.         ##
 ######################################################
-VERSION='1.9.2'
+VERSION='1.9.3'
 
 # Check for required programs
 if [ -z "$CPPTRAJ" ] ; then
@@ -266,17 +266,17 @@ while read OPTLINE ; do
       VALBO=`awk '{if ($2 == "O3'\''") print $9}' tmp.bb.mol2`
       #VALBO=$(grep "O3' " tmp.bb.mol2 | awk '{print $9}')
     fi    
-    VALSO=$(grep "O3' " tmp.sugar.mol2 | awk '{print $9}')
+    VALSO=$(grep -w "O3' " tmp.sugar.mol2 | awk '{print $9}')
     echo "Replacing sugar O3' $VALSO with backbone OP3 $VALBO"
     sed "s/$VALSO/$VALBO/" tmp.sugar.mol2 > tmp.o3.sugar.mol2
 
     # Copy C1' H1' from base to sugar
-    VALC1base=`grep "C1' " tmp.base.mol2 | awk '{print $9}'`
-    VALC1sugar=`grep "C1' " tmp.o3.sugar.mol2 | awk '{print $9}'`
+    VALC1base=`grep -w "C1' " tmp.base.mol2 | awk '{print $9}'`
+    VALC1sugar=`grep -w "C1' " tmp.o3.sugar.mol2 | awk '{print $9}'`
     sed "s/$VALC1sugar/$VALC1base/" tmp.o3.sugar.mol2 > tmp.o3.c1.sugar.mol2
     echo "Replacing sugar C1' $VALC1sugar with base C1' $VALC1base"
-    VALH1base=`grep "H1' " tmp.base.mol2 | awk '{print $9}'`
-    VALH1sugar=`grep "H1' " tmp.o3.c1.sugar.mol2 | awk '{print $9}'`
+    VALH1base=`grep -w "H1' " tmp.base.mol2 | awk '{print $9}'`
+    VALH1sugar=`grep -w "H1' " tmp.o3.c1.sugar.mol2 | awk '{print $9}'`
     sed "s/$VALH1sugar/$VALH1base/" tmp.o3.c1.sugar.mol2 > tmp.o3.c1.h1.sugar.mol2
     echo "Replacing sugar H1' $VALH1sugar with base H1' $VALH1base"
     cp tmp.o3.c1.h1.sugar.mol2 tmp.sugar.mol2
