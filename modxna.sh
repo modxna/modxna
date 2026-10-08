@@ -266,7 +266,7 @@ while read OPTLINE ; do
       VALBO=`awk '{if ($2 == "O3'\''") print $9}' tmp.bb.mol2`
       #VALBO=$(grep "O3' " tmp.bb.mol2 | awk '{print $9}')
     fi    
-    VALSO=$(grep "O3' " tmp.sugar.mol2 | awk '{print $9}')
+    VALSO=$(grep -w "O3' " tmp.sugar.mol2 | awk '{print $9}')
     echo "Replacing sugar O3' $VALSO with backbone OP3 $VALBO"
     sed "s/$VALSO/$VALBO/" tmp.sugar.mol2 > tmp.o3.sugar.mol2
 
