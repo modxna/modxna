@@ -434,7 +434,6 @@ CT-N2-CK	62.82	124.774	Calculated with empirical approach
 CT-N2-CR	62.82	127.042	Calculated with empirical approach
 CT-N2-CT        64.0    119.295 same as c3-n3-c3
 CT-NT-CM	62.2    125.59              SOURCE3            1
-CT-N2-CT  64      119.295 same as c3-n3-c3
 CT-NT-N2	83.5    110.80      SOURCE3_SOURCE5           91    1.4698
 CT-OS-SO	67.1      119.89      SOURCE4_SOURCE5          312    1.5712
 CT-SO-O		64.7	104.221	same as c3-ss-o
