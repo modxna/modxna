@@ -655,6 +655,7 @@ S -CT-H2	42.7      106.75              SOURCE3            4
 S -CT-S		60.1      123.35              SOURCE3            1
 S -P -O2 	100.0   108.23    based on Genna et.al.
 S -P -OS 	100.0   108.23    based on Genna et.al.
+S -P -S   39.1    114.13              SOURCE3
 SS-CA-NA	67.3	120.526	Calculated with empirical approach
 SS-CA-NC	62.9	121.654	same as n2-c2-ss
 SS-CM-CM	63.9	124.896	same as c2-c2-ss
