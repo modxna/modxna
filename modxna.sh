@@ -6,6 +6,12 @@
 ######################################################
 VERSION='1.9.3'
 
+# awk printf and the cpptraj inputs written below need '.' as decimal separator.
+# Under a locale with a decimal comma (es_*, de_*, fr_*, pt_BR, ...) the O3' line of
+# the 3'-capped sugar comes out as "-0,5105" and the sugar fragment is lost
+# ("Unit 'Sugar' is empty"). Run in the C locale whatever the user's settings.
+export LC_ALL=C
+
 # Check for required programs
 if [ -z "$CPPTRAJ" ] ; then
   CPPTRAJ=`which cpptraj`
