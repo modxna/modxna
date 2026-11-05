@@ -1,5 +1,5 @@
 @<TRIPOS>MOLECULE
-modXNA-fragment:GRS:HEAD01:@C4':HEAD01STRIP:@O10,HO10:TAIL01:@O3':TAIL01STRIP:@HHO3:HEAD03:@C1':HEAD03STRIP:@C12,H121,H122,H123
+modXNA-fragment:GRS:HEAD01:@C4':HEAD01STRIP:@O10,HO10:TAIL01:@O3':TAIL01STRIP:@HO3':HEAD03:@C1':HEAD03STRIP:@C12,H121,H122,H123
    19    19     1     0     0
 SMALL
 USER_CHARGES
@@ -19,11 +19,11 @@ USER_CHARGES
      11 H2'        -0.9260    1.6180    1.0210 H1         1 GRS     -0.006229
      12 H3'         0.6260   -0.1620    1.5700 H1         1 GRS      0.072240
      13 H4'         1.1990   -0.4430   -1.3810 H2         1 GRS     -0.015667
-     14 HHO2        0.5840    2.3930   -0.6900 HO         1 GRS      0.488015
+     14 HO2'        0.5840    2.3930   -0.6900 HO         1 GRS      0.488015
      15 H121       -3.1730    0.2650    0.8920 HC         1 GRS      0.101241
      16 H122       -1.9870   -0.7960    1.6510 HC         1 GRS      0.101241
      17 H123       -2.9720   -1.3900    0.3260 HC         1 GRS      0.101241
-     18 HHO3        2.6550    0.6390    0.7870 HO         1 GRS      0.476224
+     18 HO3'        2.6550    0.6390    0.7870 HO         1 GRS      0.476224
      19 HO10        1.5130   -2.5740   -0.6060 HO         1 GRS      0.463646
 @<TRIPOS>BOND
     1     1     4 1

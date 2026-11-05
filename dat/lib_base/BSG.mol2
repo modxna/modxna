@@ -1,5 +1,5 @@
 @<TRIPOS>MOLECULE
-modXNA-fragment:BSG:HEAD01:@N9:HEAD01STRIP:@C1',H1',C2',H2'1,H2'2,H2'3,O4',HHO4
+modXNA-fragment:BSG:HEAD01:@N9:HEAD01STRIP:@C1',H1',C2',H2'1,H2'2,H2'3,O4',HO4'
    42    43     1     0     0
 SMALL
 USER_CHARGES
@@ -24,7 +24,7 @@ USER_CHARGES
      16 H2'2        2.9990   -2.4420   -1.9350 HC         1 BSG      0.121896
      17 N19         2.1900    0.6730   -0.2590 N          1 BSG     -0.591063
      18 H2'3        3.8180   -1.1180   -1.1010 HC         1 BSG      0.121896
-     19 HHO4        3.8050   -2.3980    1.5530 HO         1 BSG      0.433595
+     19 HO4'        3.8050   -2.3980    1.5530 HO         1 BSG      0.433595
      20 C16         2.0110    1.8970    0.0420 CM         1 BSG      0.284231
      21 H2         -1.9670   -4.5030    0.2400 H5         1 BSG      0.033860
      22 C10        -3.1160    0.7990    0.2230 CM         1 BSG      0.253113

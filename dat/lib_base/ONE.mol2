@@ -1,5 +1,5 @@
 @<TRIPOS>MOLECULE
-modXNA-fragment:ONE:HEAD01:@N1:HEAD01STRIP:@C1',H1',O4',HHO4,C2',H2'1,H2'3,H2'2
+modXNA-fragment:ONE:HEAD01:@N1:HEAD01STRIP:@C1',H1',O4',HO4',C2',H2'1,H2'3,H2'2
    19    19     1     0     0
 SMALL
 USER_CHARGES
@@ -20,7 +20,7 @@ USER_CHARGES
      12 C2         -0.2950   -1.2820    0.2270 CA         1 ONE     -0.026092
      13 C2'         2.5830   -0.1390   -1.2380 CT         1 ONE     -0.275856
      14 H2'1        2.1590   -0.8360   -1.9510 HC         1 ONE      0.100412
-     15 HHO4        3.4180    0.6280    0.9810 HO         1 ONE      0.440927
+     15 HO4'        3.4180    0.6280    0.9810 HO         1 ONE      0.440927
      16 H2'2        2.4000    0.8700   -1.5890 HC         1 ONE      0.100412
      17 H2'3        3.6570   -0.3010   -1.2060 HC         1 ONE      0.100412
      18 H13        -2.2360   -2.0720    0.2240 HA         1 ONE      0.197225
