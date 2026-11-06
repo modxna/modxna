@@ -436,6 +436,8 @@ CT-N2-CT        64.0    119.295 same as c3-n3-c3
 CT-NT-CM	62.2    125.59              SOURCE3            1
 CT-NT-N2	83.5    110.80      SOURCE3_SOURCE5           91    1.4698
 CT-OS-SO	67.1      119.89      SOURCE4_SOURCE5          312    1.5712
+CT-P -OS        41.1       98.01              SOURCE3            2    0.0931
+CT-SO-CT        59.9      103.83      SOURCE3_SOURCE5           74    2.0698
 CT-SO-O		64.7	104.221	same as c3-ss-o
 CT-SO-OH	97.0       90.28      SOURCE4_SOURCE5           21    0.2709
 CQ-CB-CB	71.5    121.81              SOURCE3           10    0.3843
@@ -472,6 +474,7 @@ CZ-CZ-HA	44.8    180.00              SOURCE3            1
 CZ-CM-CT	65.1	130.435	same as c1-c2-c3
 CZ-CT-CM	65.1	130.435	same as c1-c2-c3
 H1-CT-O		47.5	104.387	Calculated with empirical approach
+H1-CT-P         53.100     109.450   same as hc-c3-p4, penalty score=  0.8
 H1-CT-SO	42.5	107.041	same as hc-c3-ss
 H4-CA-OS	64.3      111.15              SOURCE3            1
 HO-OH-OS	59.4    100.87              SOURCE3            1
@@ -650,6 +653,7 @@ P -CM-CM	77.4    120.240 same as ca-ca-p5, penalty score=  0.0
 P -CM-HA	50.0    119.375 Calculated using p5-c2-ha, penalty score= 36.0
 P -CT-CT	80.5      112.02      SOURCE4_SOURCE5          346    1.5599
 P -CT-HC	54.6      108.43      SOURCE3_SOURCE5          513    1.0539
+P -CT-SO        78.388     110.690   Calculated using p3-c3-s6, penalty score=  2.7
 P -N*-S    	85.3    119.890   SOURCE3            1
 S -CT-H2	42.7      106.75              SOURCE3            4
 S -CT-S		60.1      123.35              SOURCE3            1
@@ -779,6 +783,7 @@ CT-OF-P-OS    1	   0.337	 0.000		 3
 CT-CT-OF-P    1	   0.337	 0.000		 1
 X -O2-P -X    3    2.400         0.000           2.000
 X -CT-O2-X    3    1.150         0.000           3.000      JCC,7,(1986),230
+X -CT-P -X    6    0.800         0.000           3.000      same as gaff X -c3-p4-X
 X -CV-CV-X    4    1.200       180.000           2.000
 X -CM-NB-X    2    9.60        180.0             2.000      same as X-CA-NC-X
 X -CA-S6-X    6    3.000         0.000           2.000
