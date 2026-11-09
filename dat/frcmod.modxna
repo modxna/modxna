@@ -231,6 +231,7 @@ CA-CM-NO	85.1    123.46      SOURCE4_SOURCE5           26    1.6311
 CA-CT-C		66.1    111.91         CORR_SOURCE5           65    1.7402
 CA-CT-HA	47.1	110.000	
 CA-CT-H1	47.2    110.69      SOURCE4_SOURCE5           49    0.9061
+CA-CT-H2        47.0    109.56      SOURCE3_SOURCE5         3349    0.8812
 CA-CT-OS	86.0    108.56      SOURCE4_SOURCE5          763    1.7474
 CA-CT-N*	83.5    112.38      SOURCE4_SOURCE5          512    1.5411
 CA-CT-NT	85.3      123.24         CORR_SOURCE5          246    2.3557
